@@ -1,3 +1,5 @@
+# 初始化数据库
+
 CREATE TABLE basic_information ( 
         `protein_id` INT primary key,  -- 即 index
         `ECNumber` text NOT NULL, -- length <= 16
@@ -157,7 +159,7 @@ CREATE TABLE user (
         `email` text unique, -- 邮箱
         `password` text, -- 加密后的密码
         `name` text, -- 昵称？需要吗
-        `is_admin` boolean DEFAULT FALSE -- 是否管理员？true 则为管理员
+        `role_number` smallint DEFAULT 0 -- 0为普通用户，大于等于10为管理员?
 );
 CREATE INDEX user_email_and_password_btree 
 ON user
