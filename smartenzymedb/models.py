@@ -2,6 +2,10 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, SmallInteger, DECIMAL, ForeignKey, Index
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+
 db = SQLAlchemy()    # 注意这里不再传入 app 了
 
 
@@ -43,3 +47,100 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.user_id)
+
+Base = declarative_base()
+
+class BasicInformation(Base):
+    __tablename__ = 'basic_information'
+    protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    ECNumber = Column(Text, nullable=False)
+    ProteinName = Column(Text, nullable=False)
+    Organism = Column(Text)
+    UniprotID = Column(Text)
+    Sequence = Column(Text)
+    SequenceLength = Column(SmallInteger)
+    PDBID_WT = Column(Text)
+    PDBID_MUT = Column(Text)
+    AlphaFoldDB = Column(Text)
+    Mutation = Column(Text)
+    MutatedChain = Column(Text)
+    MutationCount = Column(SmallInteger)
+
+    # Indices (SQLAlchemy creates these automatically in many cases, but explicit indices can be defined)
+    __table_args__ = (
+        Index('basic_information_basic_cols_gin', ECNumber, ProteinName, UniprotID, PDBID_WT, PDBID_MUT, Mutation, postgresql_using='gin'),
+        Index('basic_information_sequence_length_btree', SequenceLength),
+    )
+
+class Substrate(Base):
+    __tablename__ = 'substrate'
+    protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
+    Substrate = Column(Text)
+    Smiles = Column(Text)
+    MolecularFormula = Column(Text)
+    Cofator = Column(Text)
+    ProductFormula = Column(Text)
+
+    # Index
+    __table_args__ = (
+        Index('substrate_basic_cols_gin', Substrate, postgresql_using='gin'),
+    )
+
+class KineticParameters(Base):
+    __tablename__ = 'kinetic_parameters'
+    protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
+    Activity = Column(DECIMAL(11, 5))
+    KM = Column(DECIMAL(11, 5))
+    Kcat = Column(DECIMAL(11, 5))
+    KMPerKcat = Column(DECIMAL(11, 5))
+    TN = Column(DECIMAL(11, 5))
+    EValue = Column(DECIMAL(11, 5))
+    DeltaDeltaG = Column(DECIMAL(11, 5))
+    Temperature = Column(SmallInteger)
+    pH = Column(DECIMAL(7, 5))
+
+    # Indices
+    __table_args__ = (
+        Index('kinetic_parameters_activity_btree', Activity),
+        Index('kinetic_parameters_km_btree', KM),
+        Index('kinetic_parameters_kcat_btree', Kcat),
+        Index('kinetic_parameters_kmperkcat_btree', KMPerKcat),
+        Index('kinetic_parameters_tn_btree', TN),
+        Index('kinetic_parameters_evalue_btree', EValue),
+        Index('kinetic_parameters_deltadeltag_btree', DeltaDeltaG),
+        Index('kinetic_parameters_temperature_btree', Temperature),
+        Index('kinetic_parameters_ph_btree', pH),
+    )
+
+class StructureInformation(Base):
+    __tablename__ = 'structure_information'
+    protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
+    RSA = Column(DECIMAL(11, 5))
+    PHI = Column(DECIMAL(11, 5))
+    PSI = Column(DECIMAL(11, 5))
+    ResidueDepth = Column(DECIMAL(11, 5))
+    CADepth = Column(DECIMAL(11, 5))
+    RelativeBfactor = Column(DECIMAL(11, 5))
+
+class ReactionCalculation(Base):
+    __tablename__ = 'reaction_calculation'
+    protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
+    ActiveResidue = Column(Text)
+    ReactionSmile = Column(Text)
+    KEGG = Column(Text)
+    ReactionEnergy = Column(DECIMAL(11, 5))
+    ReactionParameters = Column(Text)
+
+class Comment(Base):
+    __tablename__ = 'comment'
+    protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
+    Literature = Column(Text)
+    DOI = Column(Text)
+    Year = Column(SmallInteger)
+    PMID = Column(Text)
+
+    # Index
+    __table_args__ = (
+        Index('comment_year_btree', Year),
+        Index('comment_basic_cols_gin', PMID, postgresql_using='gin'),
+    )
