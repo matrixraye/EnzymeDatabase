@@ -3,7 +3,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, SmallInteger, DECIMAL, ForeignKey, Index
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()    # 注意这里不再传入 app 了
@@ -47,10 +46,7 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.user_id)
-
-Base = declarative_base()
-
-class BasicInformation(Base):
+class BasicInformation(db.Model):
     __tablename__ = 'basic_information'
     protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
     ECNumber = Column(Text, nullable=False)
@@ -66,13 +62,23 @@ class BasicInformation(Base):
     MutatedChain = Column(Text)
     MutationCount = Column(SmallInteger)
 
-    # Indices (SQLAlchemy creates these automatically in many cases, but explicit indices can be defined)
     __table_args__ = (
-        Index('basic_information_basic_cols_gin', ECNumber, ProteinName, UniprotID, PDBID_WT, PDBID_MUT, Mutation, postgresql_using='gin'),
+        Index('basic_information_basic_cols_gin', 
+              "ECNumber", "ProteinName", "UniprotID", "PDBID_WT", "PDBID_MUT", "Mutation", 
+              postgresql_using='gin', 
+              postgresql_ops={
+                  'ECNumber': 'gin_bigm_ops', 
+                  'ProteinName': 'gin_bigm_ops', 
+                  'UniprotID': 'gin_bigm_ops',
+                  'PDBID_WT': 'gin_bigm_ops',
+                  'PDBID_MUT': 'gin_bigm_ops',
+                  'Mutation': 'gin_bigm_ops'
+              }
+        ),
         Index('basic_information_sequence_length_btree', SequenceLength),
     )
 
-class Substrate(Base):
+class Substrate(db.Model):
     __tablename__ = 'substrate'
     protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
     Substrate = Column(Text)
@@ -81,12 +87,17 @@ class Substrate(Base):
     Cofator = Column(Text)
     ProductFormula = Column(Text)
 
-    # Index
     __table_args__ = (
-        Index('substrate_basic_cols_gin', Substrate, postgresql_using='gin'),
+        Index('substrate_basic_cols_gin', 
+              "Substrate", 
+              postgresql_using='gin', 
+              postgresql_ops={
+                  'Substrate': 'gin_bigm_ops'
+              }
+        ),
     )
 
-class KineticParameters(Base):
+class KineticParameters(db.Model):
     __tablename__ = 'kinetic_parameters'
     protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
     Activity = Column(DECIMAL(11, 5))
@@ -112,7 +123,7 @@ class KineticParameters(Base):
         Index('kinetic_parameters_ph_btree', pH),
     )
 
-class StructureInformation(Base):
+class StructureInformation(db.Model):
     __tablename__ = 'structure_information'
     protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
     RSA = Column(DECIMAL(11, 5))
@@ -122,7 +133,7 @@ class StructureInformation(Base):
     CADepth = Column(DECIMAL(11, 5))
     RelativeBfactor = Column(DECIMAL(11, 5))
 
-class ReactionCalculation(Base):
+class ReactionCalculation(db.Model):
     __tablename__ = 'reaction_calculation'
     protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
     ActiveResidue = Column(Text)
@@ -131,7 +142,7 @@ class ReactionCalculation(Base):
     ReactionEnergy = Column(DECIMAL(11, 5))
     ReactionParameters = Column(Text)
 
-class Comment(Base):
+class Comment(db.Model):
     __tablename__ = 'comment'
     protein_id = Column(BigInteger, ForeignKey('basic_information.protein_id'), primary_key=True)
     Literature = Column(Text)
