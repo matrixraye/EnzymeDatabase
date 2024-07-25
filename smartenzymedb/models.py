@@ -2,10 +2,11 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
-from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, SmallInteger, DECIMAL, ForeignKey, Index
+from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, SmallInteger, DECIMAL, ForeignKey, \
+    Index
 from sqlalchemy.orm import relationship
 
-db = SQLAlchemy()    # 注意这里不再传入 app 了
+db = SQLAlchemy()  # 注意这里不再传入 app 了
 
 
 class User(db.Model, UserMixin):
@@ -19,12 +20,12 @@ class User(db.Model, UserMixin):
     email = db.Column(Text, unique=True, nullable=False)
     _password = db.Column('password', Text, nullable=False)
     role_number = db.Column(db.SmallInteger, default=ROLE_USER)
-    
+
     __table_args__ = (
-        Index('user_email_and_password_btree', 
+        Index('user_email_and_password_btree',
               "email", "password",
               postgresql_using='btree'
-        )
+              ),
     )
 
     def __repr__(self):
@@ -53,6 +54,8 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.user_id)
+
+
 class BasicInformation(db.Model):
     __tablename__ = 'basic_information'
     protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
@@ -69,28 +72,36 @@ class BasicInformation(db.Model):
     MutatedChain = Column(Text)
     MutationCount = Column(SmallInteger)
 
+    # Referer.
+    substrate = relationship('Substrate', backref="BasicInformation", uselist=False, lazy=True)
+    kinetic_parameters = relationship('KineticParameters', backref="BasicInformation", uselist=False, lazy=True)
+    structure_information = relationship('StructureInformation', backref="BasicInformation", uselist=False, lazy=True)
+    reaction_calculation = relationship('ReactionCalculation', backref="BasicInformation", uselist=False, lazy=True)
+    comment = relationship('Comment', backref="BasicInformation", uselist=False, lazy=True)
+
     __table_args__ = (
-        Index('basic_information_basic_cols_gin', 
+        Index('basic_information_basic_cols_gin',
               "ECNumber", "ProteinName", "UniprotID", "PDBID_WT", "PDBID_MUT", "Mutation",
               "Organism", "MutationCount",
-              postgresql_using='gin', 
+              postgresql_using='gin',
               postgresql_ops={
-                  'ECNumber': 'gin_bigm_ops', 
-                  'ProteinName': 'gin_bigm_ops', 
+                  'ECNumber': 'gin_bigm_ops',
+                  'ProteinName': 'gin_bigm_ops',
                   'UniprotID': 'gin_bigm_ops',
                   'PDBID_WT': 'gin_bigm_ops',
                   'PDBID_MUT': 'gin_bigm_ops',
                   'Mutation': 'gin_bigm_ops'
               }
-        ),
+              ),
         Index('basic_information_sequence_length_btree', SequenceLength,
               postgresql_using='btree'
-        ),
+              ),
     )
+
 
 class Substrate(db.Model):
     __tablename__ = 'substrate'
-    protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    protein_id = Column(BigInteger, ForeignKey(BasicInformation.protein_id), primary_key=True)
     Substrate = Column(Text)
     Smiles = Column(Text)
     MolecularFormula = Column(Text)
@@ -98,18 +109,19 @@ class Substrate(db.Model):
     ProductFormula = Column(Text)
 
     __table_args__ = (
-        Index('substrate_basic_cols_gin', 
-              "Substrate", 
-              postgresql_using='gin', 
+        Index('substrate_basic_cols_gin',
+              "Substrate",
+              postgresql_using='gin',
               postgresql_ops={
                   'Substrate': 'gin_bigm_ops'
               }
-        ),
+              ),
     )
+
 
 class KineticParameters(db.Model):
     __tablename__ = 'kinetic_parameters'
-    protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    protein_id = Column(BigInteger, ForeignKey(BasicInformation.protein_id), primary_key=True)
     Activity = Column(DECIMAL(11, 5))
     KM = Column(DECIMAL(11, 5))
     Kcat = Column(DECIMAL(11, 5))
@@ -133,9 +145,10 @@ class KineticParameters(db.Model):
         Index('kinetic_parameters_ph_btree', pH, postgresql_using='btree'),
     )
 
+
 class StructureInformation(db.Model):
     __tablename__ = 'structure_information'
-    protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    protein_id = Column(BigInteger, ForeignKey(BasicInformation.protein_id), primary_key=True)
     RSA = Column(DECIMAL(11, 5))
     PHI = Column(DECIMAL(11, 5))
     PSI = Column(DECIMAL(11, 5))
@@ -143,18 +156,20 @@ class StructureInformation(db.Model):
     CADepth = Column(DECIMAL(11, 5))
     RelativeBfactor = Column(DECIMAL(11, 5))
 
+
 class ReactionCalculation(db.Model):
     __tablename__ = 'reaction_calculation'
-    protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    protein_id = Column(BigInteger, ForeignKey(BasicInformation.protein_id), primary_key=True)
     ActiveResidue = Column(Text)
     ReactionSmile = Column(Text)
     KEGG = Column(Text)
     ReactionEnergy = Column(DECIMAL(11, 5))
     ReactionParameters = Column(Text)
 
+
 class Comment(db.Model):
     __tablename__ = 'comment'
-    protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    protein_id = Column(BigInteger, ForeignKey(BasicInformation.protein_id), primary_key=True)
     Literature = Column(Text)
     DOI = Column(Text)
     Year = Column(SmallInteger)
