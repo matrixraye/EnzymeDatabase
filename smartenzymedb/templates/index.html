@@ -3,8 +3,81 @@
 {% block title %}Home{% endblock %}
 
 {% block body %}
-  {% for user in users %}
-    <p>{{ user.user_id }} - {{ user.username }}</p>
-  {% endfor %}
-{% endblock %}
+<div class="row">
+  <!-- Sidebar -->
+  <div class="col-12 col-lg-3 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">
+          <a href="#" class="text-decoration-none">
+            <b>Enzyme Class</b>
+          </a>
+        </h5>
+        <ul class="list-group list-group-flush">
+          <!-- Enzyme Class List -->
+          {% for i in range(1, 8) %}
+          <li class="list-group-item">
+            <a href="#" class="text-decoration-none">
+              <b>{{ i }}</b>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
 
+  <!-- Main Content -->
+  <div class="col-12 col-lg-9">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h1 class="card-title text-center">Welcome to the SmartEnzymeDB Database!</h1>
+        <p class="card-text">
+          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8726016132840400" crossorigin="anonymous"> </script>
+          <ins class="adsbygoogle" style="display:block;text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-8726016132840400" data-ad-slot="8472951735"></ins>
+        </p>
+        <article style="color: rgb(51, 51, 51); font-family: 'Open Sans', sans-serif; font-size: 18px; white-space: normal;">
+          <h2 id="introduction" class="mt-4">Introduction</h2>
+          <p>
+            The aim of the SmartEnzymeDB database is to provide a comprehensive collection of experimentally measured binding affinity data for all biomolecular complexes deposited in the Protein Data Bank (PDB). It provides an essential linkage between the energetic and structural information of those complexes, which is helpful for various computational and statistical studies on molecular recognition, drug discovery, and many more.
+          </p>
+          <p>
+            The SmartEnzymeDB database was originally developed by Prof. Lujia Zhang's group at the East China Normal University in China, which was first released to the public in September, 2024. The SmartEnzymeDB database is updated on an annual base to keep up with the growth of the Protein Data Bank.
+          </p>
+        </article>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <!-- Total Entries Card -->
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Total Entries</h5>
+            <p class="card-text fs-4">100,000</p>
+          </div>
+        </div>
+      </div>
+      <!-- Version Info Card -->
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Current Version: 2024</h5>
+            <p class="card-text">AI enzyme database</p>
+          </div>
+        </div>
+      </div>
+      <!-- Help Card -->
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Help</h5>
+            <p class="card-text">Find tutorials and FAQs in the help section.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

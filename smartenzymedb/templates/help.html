@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Help{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+  <h2 class="text-center mb-4">Help</h2>
+
+  <div class="accordion" id="helpAccordion">
+    <!-- Basics Section -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingBasics">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasics" aria-expanded="true" aria-controls="collapseBasics">
+          BASICS
+        </button>
+      </h2>
+      <div id="collapseBasics" class="accordion-collapse collapse show" aria-labelledby="headingBasics" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+          <ul class="list-group">
+            <li class="list-group-item">Overview of LICEDB</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Module Section -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingSearchModule">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSearchModule" aria-expanded="false" aria-controls="collapseSearchModule">
+          SEARCH MODULE
+        </button>
+      </h2>
+      <div id="collapseSearchModule" class="accordion-collapse collapse" aria-labelledby="headingSearchModule" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+          <ul class="list-group">
+            <li class="list-group-item">Basic Search page usage flow</li>
+            <li class="list-group-item">Advanced Search page usage flow</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Network Tools Section -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingNetworkTools">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNetworkTools" aria-expanded="false" aria-controls="collapseNetworkTools">
+          NETWORK TOOLS IN LICEDB
+        </button>
+      </h2>
+      <div id="collapseNetworkTools" class="accordion-collapse collapse" aria-labelledby="headingNetworkTools" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+          <ul class="list-group">
+            <li class="list-group-item">BLAST Search the flow of using the interface</li>
+            <li class="list-group-item">Clustal Omega search the flow of using the interface</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit & Contact Section -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingSubmitContact">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubmitContact" aria-expanded="false" aria-controls="collapseSubmitContact">
+          SUBMIT & CONTACT
+        </button>
+      </h2>
+      <div id="collapseSubmitContact" class="accordion-collapse collapse" aria-labelledby="headingSubmitContact" data-bs-parent="#helpAccordion">
+        <div class="accordion-body">
+          <ul class="list-group">
+            <li class="list-group-item">Submit your data</li>
+            <li class="list-group-item">How to contact us</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

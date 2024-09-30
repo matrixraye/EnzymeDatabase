@@ -5,7 +5,7 @@ from flask_login import UserMixin
 from sqlalchemy import create_engine, Column, Integer, BigInteger, String, Text, SmallInteger, DECIMAL, ForeignKey, Index
 from sqlalchemy.orm import relationship
 
-db = SQLAlchemy()    # 注意这里不再传入 app 了
+db = SQLAlchemy()   
 
 
 class User(db.Model, UserMixin):
@@ -19,6 +19,13 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(64), unique=True, index=True, nullable=False)
     _password = db.Column('password', db.String(256), nullable=False)
     role = db.Column(db.SmallInteger, default=ROLE_USER)
+
+    __table_args__ = (
+        Index('user_email_and_password_btree',
+              "email", "password",
+              postgresql_using='btree'
+              ),
+    )
 
     def __repr__(self):
         return '<User:{}>'.format(self.username)
@@ -46,6 +53,7 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.user_id)
+
 class BasicInformation(db.Model):
     __tablename__ = 'basic_information'
     protein_id = Column(BigInteger, primary_key=True, autoincrement=True)
@@ -61,6 +69,13 @@ class BasicInformation(db.Model):
     Mutation = Column(Text)
     MutatedChain = Column(Text)
     MutationCount = Column(SmallInteger)
+
+    # Referer.
+    substrate = relationship('Substrate', backref="BasicInformation", uselist=False, lazy=True)
+    kinetic_parameters = relationship('KineticParameters', backref="BasicInformation", uselist=False, lazy=True)
+    structure_information = relationship('StructureInformation', backref="BasicInformation", uselist=False, lazy=True)
+    reaction_calculation = relationship('ReactionCalculation', backref="BasicInformation", uselist=False, lazy=True)
+    comment = relationship('Comment', backref="BasicInformation", uselist=False, lazy=True)
 
     __table_args__ = (
         Index('basic_information_basic_cols_gin', 
@@ -112,15 +127,15 @@ class KineticParameters(db.Model):
 
     # Indices
     __table_args__ = (
-        Index('kinetic_parameters_activity_btree', Activity),
-        Index('kinetic_parameters_km_btree', KM),
-        Index('kinetic_parameters_kcat_btree', Kcat),
-        Index('kinetic_parameters_kmperkcat_btree', KMPerKcat),
-        Index('kinetic_parameters_tn_btree', TN),
-        Index('kinetic_parameters_evalue_btree', EValue),
-        Index('kinetic_parameters_deltadeltag_btree', DeltaDeltaG),
-        Index('kinetic_parameters_temperature_btree', Temperature),
-        Index('kinetic_parameters_ph_btree', pH),
+        Index('kinetic_parameters_activity_btree', Activity, postgresql_using='btree'),
+        Index('kinetic_parameters_km_btree', KM, postgresql_using='btree'),
+        Index('kinetic_parameters_kcat_btree', Kcat, postgresql_using='btree'),
+        Index('kinetic_parameters_kmperkcat_btree', KMPerKcat, postgresql_using='btree'),
+        Index('kinetic_parameters_tn_btree', TN, postgresql_using='btree'),
+        Index('kinetic_parameters_evalue_btree', EValue, postgresql_using='btree'),
+        Index('kinetic_parameters_deltadeltag_btree', DeltaDeltaG, postgresql_using='btree'),
+        Index('kinetic_parameters_temperature_btree', Temperature, postgresql_using='btree'),
+        Index('kinetic_parameters_ph_btree', pH, postgresql_using='btree'),
     )
 
 class StructureInformation(db.Model):

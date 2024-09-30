@@ -1,4 +1,5 @@
 import os
+from urllib.parse import quote_plus
 
 class BaseConfig:
     """ 配置基类 """
@@ -22,7 +23,9 @@ class DevelopmentConfig(BaseConfig):
 
     DEBUG = True
     creds = BaseConfig.get_db_credentials()
-    SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{creds["username"]}:{creds["password"]}@localhost:5432/test_db'
+    # URL encode the password
+    encoded_password = quote_plus(creds["password"])
+    SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{creds["username"]}:{encoded_password}@localhost:5432/test_db'
 
 
 class ProductionConfig(BaseConfig):

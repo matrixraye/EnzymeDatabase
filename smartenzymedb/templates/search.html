@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_form %}
+
+{% block title %}Search{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+  <!-- 搜索页面标题 -->
+  <h2 class="text-center mb-4">SEARCH</h2>
+
+  <div class="row">
+    <!-- 快速搜索部分 -->
+    <div class="col-md-6">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h3 class="card-title">Quick Search</h3>
+          <form method="POST">
+            {{ quick_form.hidden_tag() }}
+            <div class="form-group mb-3">
+              {{ quick_form.query.label(class="form-label") }}
+              {{ quick_form.query(class="form-control") }}
+            </div>
+            <div class="d-grid">
+              <button name="quick_search" class="btn btn-primary btn-lg">Quick search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 高级搜索部分 -->
+    <div class="col-md-6">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h3 class="card-title">Advanced Search</h3>
+          <form method="POST">
+            {{ advanced_form.hidden_tag() }}
+
+            <!-- 使用Bootstrap网格系统创建表格布局 -->
+            <div class="row mb-3">
+              <!-- 左侧列：标签 -->
+              <div class="col-md-6 py-2">
+                <div class="form-label">Enzyme Name</div>
+                {{ advanced_form.ProteinName(class="form-control") }}
+              </div>
+
+              <div class="col-md-6 py-2">
+                <div class="form-label">E.C.number</div>
+                {{ advanced_form.ECNumber(class="form-control") }}
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6 py-2">
+                <div class="form-label">UniprotID</div>
+                {{ advanced_form.Organism(class="form-control") }}
+              </div>
+
+              <div class="col-md-6 py-2">
+                <div class="form-label">PDBID</div>
+                {{ advanced_form.UniprotID(class="form-control") }}
+              </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <div class="d-grid mt-4">
+              <button name="advanced_search" class="btn btn-secondary btn-lg">Advanced Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 搜索结果展示部分 -->
+  {% if results is not none %}
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">Search Results</h3>
+      {% if results %}
+      <ul class="list-group">
+        {% for result in results %}
+        <li class="list-group-item">
+          <strong>{{ result.ProteinName }}</strong> - {{ result.ECNumber }} - {{ result.Organism }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-muted">未找到匹配的结果。</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

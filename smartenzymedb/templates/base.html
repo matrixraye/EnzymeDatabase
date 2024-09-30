@@ -24,16 +24,16 @@
             <div class="collapse navbar-collapse" id="bdNavbar">
                 <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav pt-2 py-md-0 ms-auto">
                     <li class="nav-item col-6 col-md-auto">
-                        <a class="nav-link p-2" href="#" title="Bootstrap教程">文章教程</a>
+                        <a class="nav-link p-2" href="{{ url_for('front.search') }}" title="search">Seasrch</a>
                     </li>
                     <li class="nav-item col-6 col-md-auto">
-                        <a class="nav-link p-2" href="#" title="Bootstrap框架文档">文档手册</a>
+                        <a class="nav-link p-2" href="{{ url_for('front.browse') }}" title="browse">Browse</a>
                     </li>
                     <li class="nav-item col-6 col-md-auto">
-                        <a class="nav-link p-2" href="#" title="Bootstrap下载">资源下载</a>
+                        <a class="nav-link p-2" href="{{ url_for('front.help') }}" title="help">Help</a>
                     </li>
                     <li class="nav-item col-6 col-md-auto">
-                        <a class="nav-link p-2" href="#">字体图标</a>
+                        <a class="nav-link p-2" href="#">Static</a>
                     </li>
                 </ul>
 
